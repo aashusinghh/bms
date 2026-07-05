@@ -1,24 +1,28 @@
 name: Deploy to staging
+
 on:
   push:
     branches:
       - production
 
 jobs:
-    redeploy_everything:
-        name: Redeploy everything to staging clutser
-        runs-on: ubuntu-latest
-        steps:
-            - name: ssh into server
-              run: |
-                echo "${{ secrets.SSH_AASHU_KEY }}" &> ~/ssh_key
-                # mkdir -p /home/runner/.ssh
-                # echo "${{ secrets.KNOWN_HOST }}" &> ~/.ssh/known_hosts
-                ssh -i ~/ssh_key ubuntu@13.220.247.196
-                cd bms
-                git pull 
-                pnpm install 
-                pnpm run build
-                pm2 restart http-server
-                pm2 restart ws-server
-                pm2 restart fe-server
+  redeploy_everything:
+    name: Redeploy everything to staging cluster
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: SSH into server and deploy
+        run: |
+          echo "${{ secrets.SSH_AASHU_KEY }}" > ~/ssh_key
+          chmod 600 ~/ssh_key
+
+          ssh -o StrictHostKeyChecking=no \
+              -i ~/ssh_key ubuntu@13.220.247.196 << 'EOF'
+            cd ~/bms
+            git pull
+            pnpm install
+            pnpm run build
+            pm2 restart http-server
+            pm2 restart ws-server
+            pm2 restart fe-server
+          EOF
