@@ -17,7 +17,7 @@ jobs:
           chmod 600 ~/ssh_key
 
           ssh -o StrictHostKeyChecking=no \
-              -i ~/ssh_key ubuntu@13.220.247.196 << 'EOF'
+              -i ~/ssh_key ubuntu@54.234.226.248 << 'EOF'
             cd ~/bms
             git pull
             pnpm install
